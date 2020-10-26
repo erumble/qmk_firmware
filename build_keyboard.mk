@@ -292,6 +292,29 @@ ifneq ("$(wildcard $(KEYMAP_PATH)/config.h)","")
     CONFIG_H += $(KEYMAP_PATH)/config.h
 endif
 
+# Pull in stuff from info.json
+INFO_JSON_FILES :=
+ifneq ("$(wildcard $(KEYBOARD_PATH_1)/info.json)","")
+    INFO_JSON_FILES += $(KEYBOARD_PATH_1)/info.json
+endif
+ifneq ("$(wildcard $(KEYBOARD_PATH_2)/info.json)","")
+    INFO_JSON_FILES += $(KEYBOARD_PATH_2)/info.json
+endif
+ifneq ("$(wildcard $(KEYBOARD_PATH_3)/info.json)","")
+    INFO_JSON_FILES += $(KEYBOARD_PATH_3)/info.json
+endif
+ifneq ("$(wildcard $(KEYBOARD_PATH_4)/info.json)","")
+    INFO_JSON_FILES += $(KEYBOARD_PATH_4)/info.json
+endif
+ifneq ("$(wildcard $(KEYBOARD_PATH_5)/info.json)","")
+    INFO_JSON_FILES += $(KEYBOARD_PATH_5)/info.json
+endif
+
+CONFIG_H += $(KEYBOARD_OUTPUT)/src/info_config.h
+
+$(KEYBOARD_OUTPUT)/src/info_config.h: $(INFO_JSON_FILES)
+	bin/qmk generate-config-h --quiet --keyboard $(KEYBOARD) --output $(KEYBOARD_OUTPUT)/src/info_config.h
+
 # project specific files
 SRC += $(KEYBOARD_SRC) \
     $(KEYMAP_C) \
@@ -353,7 +376,7 @@ $(KEYBOARD_OUTPUT)_CONFIG := $(PROJECT_CONFIG)
 
 # Default target.
 all: build check-size
-build: elf cpfirmware
+build: $(KEYBOARD_OUTPUT)/src/info_config.h elf cpfirmware
 check-size: build
 objs-size: build
 
